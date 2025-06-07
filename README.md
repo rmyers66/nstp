@@ -69,5 +69,7 @@ The output Word document will be created alongside your input CSV.
 
 ---
 
-*Developed by Your Name*
-*Contact: you@example.com*
+5z4xbu-codex/add-license-file-and-reference-in-readme
+*Developed by R. Clark Myers, M.Ed.*
+*Contact: rmyers66@gatech.edu*
+
