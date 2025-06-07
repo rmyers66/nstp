@@ -5,7 +5,11 @@ a = Analysis(
     ['generate_qr_badges_final.py'],
     pathex=[],
     binaries=[],
-    datas=[],
+    datas=[
+        ('GT_full_logo.png', '.'),
+        ('GT_small_logo.png', '.'),
+        ('GT_ribbon.png', '.')
+    ],
     hiddenimports=[],
     hookspath=[],
     hooksconfig={},
