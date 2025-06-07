@@ -29,7 +29,8 @@ exe = EXE(
     console=False,
     disable_windowed_traceback=False,
     argv_emulation=False,
-    target_arch="universal2",
+    # build for current Python architecture
+    target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
     icon=['AppIcon.icns'],
