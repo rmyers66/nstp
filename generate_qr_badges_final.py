@@ -40,6 +40,11 @@ except ImportError:
 # PIL import for image handling
 try:
     from PIL import Image, ImageTk
+    # Pillow 10+ moved resampling filters under Image.Resampling
+    if hasattr(Image, "Resampling"):
+        RESAMPLE = Image.Resampling.LANCZOS
+    else:  # pragma: no cover - older Pillow versions
+        RESAMPLE = getattr(Image, "LANCZOS", Image.ANTIALIAS)
     _pil_available = True
 except ImportError:
     _pil_available = False
@@ -301,7 +306,7 @@ def create_progress_window(title: str, total: int):
 
     img_small = _load_embedded_image(SMALL_LOGO_B64)
     if img_small:
-        logo_resized = img_small.resize((100, 50), Image.ANTIALIAS)
+        logo_resized = img_small.resize((100, 50), RESAMPLE)
         logo_tk = ImageTk.PhotoImage(logo_resized)
         logo_lbl = tk.Label(prog, image=logo_tk, bg=GT_NAVY)
         logo_lbl.image = logo_tk
@@ -946,7 +951,7 @@ def main() -> None:
                 # Resize to ~300px wide, preserving aspect ratio
                 w_percent = (300 / float(img_full.size[0]))
                 hsize = int((float(img_full.size[1]) * float(w_percent)))
-                logo_img = img_full.resize((300, hsize), Image.ANTIALIAS)
+                logo_img = img_full.resize((300, hsize), RESAMPLE)
                 logo_tk = ImageTk.PhotoImage(logo_img)
                 logo_lbl = tk.Label(root, image=logo_tk, bg=GT_NAVY)
                 logo_lbl.image = logo_tk
@@ -969,7 +974,7 @@ def main() -> None:
                 dialog_width = root.winfo_screenwidth() // 2
                 w_percent = (dialog_width / float(img_ribbon.size[0]))
                 hsize = int((float(img_ribbon.size[1]) * float(w_percent)))
-                ribbon_img = img_ribbon.resize((dialog_width, hsize), Image.ANTIALIAS)
+                ribbon_img = img_ribbon.resize((dialog_width, hsize), RESAMPLE)
                 ribbon_tk = ImageTk.PhotoImage(ribbon_img)
                 ribbon_lbl = tk.Label(root, image=ribbon_tk, bg=GT_NAVY)
                 ribbon_lbl.image = ribbon_tk
