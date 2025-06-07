@@ -70,11 +70,15 @@ The output Word document will be created alongside your input CSV.
 ## Building Standalone Apps
 
 PyInstaller spec files are provided for macOS (`QR_Badges_mac.spec`) and Windows (`QR_Badges_win.spec`).
+If your Python environment is single-arch, use the macOS spec as-is (or set
+`target_arch` to `arm64` or `x86_64`) and run:
+
+```bash
+# macOS build (single-arch)
+pyinstaller QR_Badges_mac.spec
+```
 
 ```
-# macOS universal build
-pyinstaller QR_Badges_mac.spec
-
 # Windows build
 pyinstaller QR_Badges_win.spec
 ```
