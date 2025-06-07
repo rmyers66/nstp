@@ -299,20 +299,23 @@ def create_progress_window(title: str, total: int):
 
     prog = Tk()
     prog.title(title)
-    prog.configure(bg=GT_NAVY)
+    prog.configure(bg=WHITE)
     prog.resizable(False, False)
     prog.attributes('-topmost', True)
+
+    header = tk.Frame(prog, bg=GT_NAVY)
+    header.pack(fill='x')
 
     img_small = _load_embedded_image(SMALL_LOGO_B64)
     if img_small:
         logo_resized = img_small.resize((100, 50), RESAMPLE)
         logo_tk = ImageTk.PhotoImage(logo_resized)
-        logo_lbl = tk.Label(prog, image=logo_tk, bg=GT_NAVY)
+        logo_lbl = tk.Label(header, image=logo_tk, bg=GT_NAVY)
         logo_lbl.image = logo_tk
         logo_lbl.pack(pady=(10, 5))
     else:
         fallback_lbl = tk.Label(
-            prog, text='GT Logo', bg=GT_NAVY, fg=WHITE, font=_choose_font(prog)
+            header, text='GT Logo', bg=GT_NAVY, fg=WHITE, font=_choose_font(prog)
         )
         fallback_lbl.pack(pady=(10, 5))
 
@@ -340,8 +343,8 @@ def create_progress_window(title: str, total: int):
     percent_label = tk.Label(
         prog,
         text='0%',
-        bg=GT_NAVY,
-        fg=WHITE,
+        bg=WHITE,
+        fg=GT_NAVY,
         font=bold_font,
     )
     percent_label.pack()
@@ -349,8 +352,8 @@ def create_progress_window(title: str, total: int):
     info_label = tk.Label(
         prog,
         text=f"0 of {total} | ETA: --:--",
-        bg=GT_NAVY,
-        fg=WHITE,
+        bg=WHITE,
+        fg=GT_NAVY,
         font=_choose_font(prog),
     )
     info_label.pack(pady=(0, 20))
@@ -922,8 +925,11 @@ def main() -> None:
         if _tk_available:
             root = Tk()
             root.title('GT QR & Name Badge Generator')
-            root.configure(bg=GT_NAVY)
+            root.configure(bg=WHITE)
             root.resizable(False, False)
+
+            header = tk.Frame(root, bg=GT_NAVY)
+            header.pack(fill='x')
 
             font_family, font_size = _choose_font(root)
             large_font = (font_family, 14, 'bold')
@@ -952,13 +958,13 @@ def main() -> None:
                 hsize = int((float(img_full.size[1]) * float(w_percent)))
                 logo_img = img_full.resize((300, hsize), RESAMPLE)
                 logo_tk = ImageTk.PhotoImage(logo_img)
-                logo_lbl = tk.Label(root, image=logo_tk, bg=GT_NAVY)
+                logo_lbl = tk.Label(header, image=logo_tk, bg=GT_NAVY)
                 logo_lbl.image = logo_tk
                 logo_lbl.pack(pady=(20, 10))
             else:
                 # Fallback text if decoding fails or PIL not available
                 fallback_lbl = tk.Label(
-                    root,
+                    header,
                     text='Georgia Tech',
                     bg=GT_NAVY,
                     fg=GT_GOLD,
