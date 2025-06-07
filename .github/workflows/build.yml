@@ -22,7 +22,7 @@ jobs:
         run: pyinstaller QR_Badges_mac.spec
       - name: Create DMG
         run: hdiutil create -volname "QR Badges" -srcfolder "dist/QR Badges.app" QR_Badges.dmg
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: qr-badges-macos
           path: QR_Badges.dmg
@@ -42,7 +42,7 @@ jobs:
         run: pyinstaller QR_Badges_win.spec
       - name: Compress build
         run: Compress-Archive -Path dist/QR_Badges -DestinationPath QR_Badges.zip
-      - uses: actions/upload-artifact@v3
+      - uses: actions/upload-artifact@v4
         with:
           name: qr-badges-windows
           path: QR_Badges.zip
