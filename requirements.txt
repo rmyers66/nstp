@@ -1,0 +1,6 @@
+pandas
+requests
+python-docx
+Pillow
+pyyaml    # only if you want YAML config support
+docx2pdf  # only if you’re using the --pdf flag on macOS/Windows
