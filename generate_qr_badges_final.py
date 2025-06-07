@@ -262,6 +262,74 @@ def convert_to_pdf(docx_path: Path, outdir: Path) -> Path:
         return None
 
 
+def create_progress_window(title: str, total: int):
+    """Create and return a progress window with a bar and labels."""
+    if not _tk_available:
+        return None, None, None, None
+
+    prog = Tk()
+    prog.title(title)
+    prog.configure(bg=GT_NAVY)
+    prog.resizable(False, False)
+    prog.attributes('-topmost', True)
+
+    img_small = _load_embedded_image(SMALL_LOGO_B64)
+    if img_small:
+        logo_resized = img_small.resize((100, 50), Image.ANTIALIAS)
+        logo_tk = ImageTk.PhotoImage(logo_resized)
+        logo_lbl = tk.Label(prog, image=logo_tk, bg=GT_NAVY)
+        logo_lbl.image = logo_tk
+        logo_lbl.pack(pady=(10, 5))
+    else:
+        fallback_lbl = tk.Label(
+            prog, text='GT Logo', bg=GT_NAVY, fg=WHITE, font=_choose_font(prog)
+        )
+        fallback_lbl.pack(pady=(10, 5))
+
+    style = Style(prog)
+    style.theme_use('clam')
+    style.configure(
+        'Flat.Horizontal.TProgressbar',
+        troughcolor=GT_NAVY,
+        background=GT_GOLD,
+        thickness=20,
+        bordercolor=GT_NAVY,
+    )
+
+    bar = Progressbar(
+        prog,
+        orient='horizontal',
+        length=360,
+        mode='determinate',
+        maximum=total,
+        style='Flat.Horizontal.TProgressbar',
+    )
+    bar.pack(padx=20, pady=(10, 5))
+
+    bold_font = (*_choose_font(prog), 'bold')
+    percent_label = tk.Label(
+        prog,
+        text='0%',
+        bg=GT_NAVY,
+        fg=WHITE,
+        font=bold_font,
+    )
+    percent_label.pack()
+
+    info_label = tk.Label(
+        prog,
+        text=f"0 of {total} | ETA: --:--",
+        bg=GT_NAVY,
+        fg=WHITE,
+        font=_choose_font(prog),
+    )
+    info_label.pack(pady=(0, 20))
+
+    prog.update()
+
+    return prog, bar, percent_label, info_label
+
+
 # ----------------------------
 # Badge Generation Functions
 # ----------------------------
@@ -298,69 +366,7 @@ def generate_labels(file_path: Path, save_path: Path, args, cfg: dict) -> None:
     rows = per_page // cols
     temp_files = []
 
-    prog = None
-    percent_label = None
-    info_label = None
-    if _tk_available:
-        prog = Tk()
-        prog.title('GT QR Badges Generator')
-        prog.configure(bg=GT_NAVY)
-        prog.resizable(False, False)
-        prog.attributes('-topmost', True)
-
-        # ─── Small GT logo at top of loading-bar window ─────────────────────
-        img_small = _load_embedded_image(SMALL_LOGO_B64)
-        if img_small:
-            logo_resized = img_small.resize((100, 50), Image.ANTIALIAS)
-            logo_tk = ImageTk.PhotoImage(logo_resized)
-            logo_lbl = tk.Label(prog, image=logo_tk, bg=GT_NAVY)
-            logo_lbl.image = logo_tk
-            logo_lbl.pack(pady=(10, 5))
-        else:
-            # Fallback text if image decoding fails
-            fallback_lbl = tk.Label(prog, text='GT Logo', bg=GT_NAVY, fg=WHITE, font=_choose_font(prog))
-            fallback_lbl.pack(pady=(10, 5))
-
-        style = Style(prog)
-        style.theme_use('clam')
-        style.configure(
-            'Flat.Horizontal.TProgressbar',
-            troughcolor=GT_NAVY,
-            background=GT_GOLD,
-            thickness=20,
-            bordercolor=GT_NAVY
-        )
-
-        bar = Progressbar(
-            prog,
-            orient='horizontal',
-            length=360,
-            mode='determinate',
-            maximum=total,
-            style='Flat.Horizontal.TProgressbar'
-        )
-        bar.pack(padx=20, pady=(10, 5))
-
-        bold_font = (*_choose_font(prog), 'bold')
-        percent_label = tk.Label(
-            prog,
-            text='0%',
-            bg=GT_NAVY,
-            fg=WHITE,
-            font=bold_font
-        )
-        percent_label.pack()
-
-        info_label = tk.Label(
-            prog,
-            text=f"0 of {total} | ETA: --:--",
-            bg=GT_NAVY,
-            fg=WHITE,
-            font=_choose_font(prog)
-        )
-        info_label.pack(pady=(0, 20))
-
-        prog.update()
+    prog, bar, percent_label, info_label = create_progress_window("GT QR Badges Generator", total)
 
     try:
         for idx, rec in enumerate(records, start=1):
@@ -496,68 +502,7 @@ def name_badges_fixed(file_path: Path, save_path: Path) -> None:
     per_page = DEFAULT_CONFIG['per_page_name']
     cols = DEFAULT_CONFIG['columns_name']
 
-    prog = None
-    percent_label = None
-    info_label = None
-    if _tk_available:
-        prog = Tk()
-        prog.title('GT Student Name Badges Generator')
-        prog.configure(bg=GT_NAVY)
-        prog.resizable(False, False)
-        prog.attributes('-topmost', True)
-
-        # ─── Small GT logo at top of loading-bar window ─────────────────────
-        img_small = _load_embedded_image(SMALL_LOGO_B64)
-        if img_small:
-            logo_resized = img_small.resize((100, 50), Image.ANTIALIAS)
-            logo_tk = ImageTk.PhotoImage(logo_resized)
-            logo_lbl = tk.Label(prog, image=logo_tk, bg=GT_NAVY)
-            logo_lbl.image = logo_tk
-            logo_lbl.pack(pady=(10, 5))
-        else:
-            fallback_lbl = tk.Label(prog, text='GT Logo', bg=GT_NAVY, fg=WHITE, font=_choose_font(prog))
-            fallback_lbl.pack(pady=(10, 5))
-
-        style = Style(prog)
-        style.theme_use('clam')
-        style.configure(
-            'Flat.Horizontal.TProgressbar',
-            troughcolor=GT_NAVY,
-            background=GT_GOLD,
-            thickness=20,
-            bordercolor=GT_NAVY
-        )
-
-        bar = Progressbar(
-            prog,
-            orient='horizontal',
-            length=360,
-            mode='determinate',
-            maximum=total,
-            style='Flat.Horizontal.TProgressbar'
-        )
-        bar.pack(padx=20, pady=(10, 5))
-
-        bold_font = (*_choose_font(prog), 'bold')
-        percent_label = tk.Label(
-            prog,
-            text='0%',
-            bg=GT_NAVY,
-            fg=WHITE,
-            font=bold_font
-        )
-        percent_label.pack()
-
-        info_label = tk.Label(
-            prog,
-            text=f"0 of {total} | ETA: --:--",
-            bg=GT_NAVY,
-            fg=WHITE,
-            font=_choose_font(prog)
-        )
-        info_label.pack(pady=(0, 20))
-
-        prog.update()
+    prog, bar, percent_label, info_label = create_progress_window("GT Student Name Badges Generator", total)
 
     try:
         for idx, rec in enumerate(records, start=1):
@@ -698,68 +643,7 @@ def guest1_badges(file_path: Path, save_path: Path) -> None:
     per_page = DEFAULT_CONFIG['per_page_name']
     cols = DEFAULT_CONFIG['columns_name']
 
-    prog = None
-    percent_label = None
-    info_label = None
-    if _tk_available:
-        prog = Tk()
-        prog.title('GT Guest 1 Name Badges Generator')
-        prog.configure(bg=GT_NAVY)
-        prog.resizable(False, False)
-        prog.attributes('-topmost', True)
-
-        # ─── Small GT logo at top of loading-bar window ─────────────────────
-        img_small = _load_embedded_image(SMALL_LOGO_B64)
-        if img_small:
-            logo_resized = img_small.resize((100, 50), Image.ANTIALIAS)
-            logo_tk = ImageTk.PhotoImage(logo_resized)
-            logo_lbl = tk.Label(prog, image=logo_tk, bg=GT_NAVY)
-            logo_lbl.image = logo_tk
-            logo_lbl.pack(pady=(10, 5))
-        else:
-            fallback_lbl = tk.Label(prog, text='GT Logo', bg=GT_NAVY, fg=WHITE, font=_choose_font(prog))
-            fallback_lbl.pack(pady=(10, 5))
-
-        style = Style(prog)
-        style.theme_use('clam')
-        style.configure(
-            'Flat.Horizontal.TProgressbar',
-            troughcolor=GT_NAVY,
-            background=GT_GOLD,
-            thickness=20,
-            bordercolor=GT_NAVY
-        )
-
-        bar = Progressbar(
-            prog,
-            orient='horizontal',
-            length=360,
-            mode='determinate',
-            maximum=total,
-            style='Flat.Horizontal.TProgressbar'
-        )
-        bar.pack(padx=20, pady=(10, 5))
-
-        bold_font = (*_choose_font(prog), 'bold')
-        percent_label = tk.Label(
-            prog,
-            text='0%',
-            bg=GT_NAVY,
-            fg=WHITE,
-            font=bold_font
-        )
-        percent_label.pack()
-
-        info_label = tk.Label(
-            prog,
-            text=f"0 of {total} | ETA: --:--",
-            bg=GT_NAVY,
-            fg=WHITE,
-            font=_choose_font(prog)
-        )
-        info_label.pack(pady=(0, 20))
-
-        prog.update()
+    prog, bar, percent_label, info_label = create_progress_window("GT Guest 1 Name Badges Generator", total)
 
     try:
         for idx, rec in enumerate(filtered, start=1):
@@ -898,68 +782,7 @@ def guest2_badges(file_path: Path, save_path: Path) -> None:
     per_page = DEFAULT_CONFIG['per_page_name']
     cols = DEFAULT_CONFIG['columns_name']
 
-    prog = None
-    percent_label = None
-    info_label = None
-    if _tk_available:
-        prog = Tk()
-        prog.title('GT Guest 2 Name Badges Generator')
-        prog.configure(bg=GT_NAVY)
-        prog.resizable(False, False)
-        prog.attributes('-topmost', True)
-
-        # ─── Small GT logo at top of loading-bar window ─────────────────────
-        img_small = _load_embedded_image(SMALL_LOGO_B64)
-        if img_small:
-            logo_resized = img_small.resize((100, 50), Image.ANTIALIAS)
-            logo_tk = ImageTk.PhotoImage(logo_resized)
-            logo_lbl = tk.Label(prog, image=logo_tk, bg=GT_NAVY)
-            logo_lbl.image = logo_tk
-            logo_lbl.pack(pady=(10, 5))
-        else:
-            fallback_lbl = tk.Label(prog, text='GT Logo', bg=GT_NAVY, fg=WHITE, font=_choose_font(prog))
-            fallback_lbl.pack(pady=(10, 5))
-
-        style = Style(prog)
-        style.theme_use('clam')
-        style.configure(
-            'Flat.Horizontal.TProgressbar',
-            troughcolor=GT_NAVY,
-            background=GT_GOLD,
-            thickness=20,
-            bordercolor=GT_NAVY
-        )
-
-        bar = Progressbar(
-            prog,
-            orient='horizontal',
-            length=360,
-            mode='determinate',
-            maximum=total,
-            style='Flat.Horizontal.TProgressbar'
-        )
-        bar.pack(padx=20, pady=(10, 5))
-
-        bold_font = (*_choose_font(prog), 'bold')
-        percent_label = tk.Label(
-            prog,
-            text='0%',
-            bg=GT_NAVY,
-            fg=WHITE,
-            font=bold_font
-        )
-        percent_label.pack()
-
-        info_label = tk.Label(
-            prog,
-            text=f"0 of {total} | ETA: --:--",
-            bg=GT_NAVY,
-            fg=WHITE,
-            font=_choose_font(prog)
-        )
-        info_label.pack(pady=(0, 20))
-
-        prog.update()
+    prog, bar, percent_label, info_label = create_progress_window("GT Guest 2 Name Badges Generator", total)
 
     try:
         for idx, rec in enumerate(filtered, start=1):
