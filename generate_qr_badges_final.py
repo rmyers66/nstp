@@ -104,7 +104,7 @@ WHITE = '#FFFFFF'
 GT_HOVER = '#D4C58C'  # lighter gold for hover
 
 # Preferred font stack
-PREFERRED_FONT = 'Roboto'
+PREFERRED_FONT = ['Roboto Condensed', 'Roboto Slab', 'Roboto']
 FALLBACK_FONTS = ['Helvetica', 'Arial']
 
 DEFAULT_CONFIG = {
@@ -129,8 +129,10 @@ REQUIRED_CSV_COLUMNS = [
 
 def _choose_font(root):
     available = set(tkfont.families(root))
-    if PREFERRED_FONT in available:
-        return (PREFERRED_FONT, 12)
+    preferred = PREFERRED_FONT if isinstance(PREFERRED_FONT, (list, tuple)) else [PREFERRED_FONT]
+    for pf in preferred:
+        if pf in available:
+            return (pf, 12)
     for fb in FALLBACK_FONTS:
         if fb in available:
             return (fb, 12)
