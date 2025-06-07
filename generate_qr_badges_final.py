@@ -144,6 +144,29 @@ def parse_args():
     return parser.parse_args()
 
 
+def load_config(path: Path) -> dict:
+    """Load configuration from JSON or YAML file."""
+    if not path:
+        return {}
+    try:
+        with open(path, 'r', encoding='utf-8') as fh:
+            if path.suffix.lower() in {'.yaml', '.yml'}:
+                try:
+                    import yaml
+                except ImportError:
+                    logging.error('pyyaml is required for YAML configs.')
+                    return {}
+                return yaml.safe_load(fh) or {}
+            else:
+                import json
+                return json.load(fh)
+    except FileNotFoundError:
+        logging.error('Config file not found: %s', path)
+    except Exception:
+        logging.exception('Failed to load config')
+    return {}
+
+
 def open_file(path: Path, background: bool = False) -> None:
     try:
         if sys.platform == 'darwin':
@@ -475,7 +498,7 @@ def generate_labels(file_path: Path, save_path: Path, args, cfg: dict) -> None:
             print('Warning: PDF conversion failed. DOCX saved at:', save_path)
 
 
-def name_badges_fixed(file_path: Path, save_path: Path) -> None:
+def name_badges_fixed(file_path: Path, save_path: Path, cfg: dict = DEFAULT_CONFIG) -> None:
     """
     Generate Student Name badges on Avery 5392 (2×3 grid, 6 per page).
     Always saves DOCX and converts to PDF.
@@ -502,8 +525,8 @@ def name_badges_fixed(file_path: Path, save_path: Path) -> None:
     sec.left_margin = Inches(0.25)
     sec.right_margin = Inches(0.25)
 
-    per_page = DEFAULT_CONFIG['per_page_name']
-    cols = DEFAULT_CONFIG['columns_name']
+    per_page = cfg['per_page_name']
+    cols = cfg['columns_name']
 
     prog, bar, percent_label, info_label = create_progress_window("GT Student Name Badges Generator", total)
 
@@ -531,11 +554,11 @@ def name_badges_fixed(file_path: Path, save_path: Path) -> None:
                 table = doc.add_table(rows=rows, cols=cols)
                 table.autofit = False
                 for cell in table.columns[0].cells:
-                    cell.width = Inches(DEFAULT_CONFIG['label_dims_in_name']['width'])
+                    cell.width = Inches(cfg['label_dims_in_name']['width'])
                 for cell in table.columns[1].cells:
-                    cell.width = Inches(DEFAULT_CONFIG['label_dims_in_name']['width'])
+                    cell.width = Inches(cfg['label_dims_in_name']['width'])
                 for row in table.rows:
-                    row.height = Inches(DEFAULT_CONFIG['label_dims_in_name']['height'])
+                    row.height = Inches(cfg['label_dims_in_name']['height'])
                     row.height_rule = WD_ROW_HEIGHT_RULE.EXACTLY
 
             r, c = divmod((idx - 1) % per_page, cols)
@@ -600,7 +623,7 @@ def name_badges_fixed(file_path: Path, save_path: Path) -> None:
             print('Warning: PDF conversion failed. DOCX saved at:', save_path)
 
 
-def guest1_badges(file_path: Path, save_path: Path) -> None:
+def guest1_badges(file_path: Path, save_path: Path, cfg: dict = DEFAULT_CONFIG) -> None:
     """
     Generate Guest 1 Name badges on Avery 5392 (2×3 grid, 6 per page).
     Uses fields:
@@ -643,8 +666,8 @@ def guest1_badges(file_path: Path, save_path: Path) -> None:
     sec.left_margin = Inches(0.25)
     sec.right_margin = Inches(0.25)
 
-    per_page = DEFAULT_CONFIG['per_page_name']
-    cols = DEFAULT_CONFIG['columns_name']
+    per_page = cfg['per_page_name']
+    cols = cfg['columns_name']
 
     prog, bar, percent_label, info_label = create_progress_window("GT Guest 1 Name Badges Generator", total)
 
@@ -672,11 +695,11 @@ def guest1_badges(file_path: Path, save_path: Path) -> None:
                 table = doc.add_table(rows=rows, cols=cols)
                 table.autofit = False
                 for cell in table.columns[0].cells:
-                    cell.width = Inches(DEFAULT_CONFIG['label_dims_in_name']['width'])
+                    cell.width = Inches(cfg['label_dims_in_name']['width'])
                 for cell in table.columns[1].cells:
-                    cell.width = Inches(DEFAULT_CONFIG['label_dims_in_name']['width'])
+                    cell.width = Inches(cfg['label_dims_in_name']['width'])
                 for row in table.rows:
-                    row.height = Inches(DEFAULT_CONFIG['label_dims_in_name']['height'])
+                    row.height = Inches(cfg['label_dims_in_name']['height'])
                     row.height_rule = WD_ROW_HEIGHT_RULE.EXACTLY
 
             r, c = divmod((idx - 1) % per_page, cols)
@@ -740,7 +763,7 @@ def guest1_badges(file_path: Path, save_path: Path) -> None:
             print('Warning: PDF conversion failed. DOCX saved at:', save_path)
 
 
-def guest2_badges(file_path: Path, save_path: Path) -> None:
+def guest2_badges(file_path: Path, save_path: Path, cfg: dict = DEFAULT_CONFIG) -> None:
     """
     Generate Guest 2 Name badges on Avery 5392 (2×3 grid, 6 per page).
     Uses fields:
@@ -782,8 +805,8 @@ def guest2_badges(file_path: Path, save_path: Path) -> None:
     sec.left_margin = Inches(0.25)
     sec.right_margin = Inches(0.25)
 
-    per_page = DEFAULT_CONFIG['per_page_name']
-    cols = DEFAULT_CONFIG['columns_name']
+    per_page = cfg['per_page_name']
+    cols = cfg['columns_name']
 
     prog, bar, percent_label, info_label = create_progress_window("GT Guest 2 Name Badges Generator", total)
 
@@ -811,11 +834,11 @@ def guest2_badges(file_path: Path, save_path: Path) -> None:
                 table = doc.add_table(rows=rows, cols=cols)
                 table.autofit = False
                 for cell in table.columns[0].cells:
-                    cell.width = Inches(DEFAULT_CONFIG['label_dims_in_name']['width'])
+                    cell.width = Inches(cfg['label_dims_in_name']['width'])
                 for cell in table.columns[1].cells:
-                    cell.width = Inches(DEFAULT_CONFIG['label_dims_in_name']['width'])
+                    cell.width = Inches(cfg['label_dims_in_name']['width'])
                 for row in table.rows:
-                    row.height = Inches(DEFAULT_CONFIG['label_dims_in_name']['height'])
+                    row.height = Inches(cfg['label_dims_in_name']['height'])
                     row.height_rule = WD_ROW_HEIGHT_RULE.EXACTLY
 
             r, c = divmod((idx - 1) % per_page, cols)
@@ -885,6 +908,12 @@ def guest2_badges(file_path: Path, save_path: Path) -> None:
 def main() -> None:
     try:
         args = parse_args()
+
+        config = DEFAULT_CONFIG.copy()
+        if args.config:
+            loaded = load_config(Path(args.config))
+            if loaded:
+                config.update(loaded)
 
         if _tk_available:
             root = Tk()
@@ -1037,36 +1066,36 @@ def main() -> None:
         if template == 'qr':
             default_name = f"{sanitized_date}_QRBadges.docx"
             save_path = Path(args.output) if args.output else pick_save_file(default_name)
-            generate_labels(file_path, save_path, args, DEFAULT_CONFIG)
+            generate_labels(file_path, save_path, args, config)
 
         elif template == 'student':
             default_name = f"{sanitized_date}_StudentNameBadges.docx"
             save_path = Path(args.output) if args.output else pick_save_file(default_name)
-            name_badges_fixed(file_path, save_path)
+            name_badges_fixed(file_path, save_path, config)
 
         elif template == 'guest1':
             default_name = f"{sanitized_date}_Guest1Badge.docx"
             save_path = Path(args.output) if args.output else pick_save_file(default_name)
-            guest1_badges(file_path, save_path)
+            guest1_badges(file_path, save_path, config)
 
         elif template == 'guest2':
             default_name = f"{sanitized_date}_Guest2Badge.docx"
             save_path = Path(args.output) if args.output else pick_save_file(default_name)
-            guest2_badges(file_path, save_path)
+            guest2_badges(file_path, save_path, config)
 
         else:  # 'all'
             qr_name = f"{sanitized_date}_QRBadges.docx"
             qr_save = pick_save_file(qr_name)
-            generate_labels(file_path, qr_save, args, DEFAULT_CONFIG)
+            generate_labels(file_path, qr_save, args, config)
 
             student_save = qr_save.parent / f"{sanitized_date}_StudentNameBadges.docx"
-            name_badges_fixed(file_path, student_save)
+            name_badges_fixed(file_path, student_save, config)
 
             guest1_save = qr_save.parent / f"{sanitized_date}_Guest1Badge.docx"
-            guest1_badges(file_path, guest1_save)
+            guest1_badges(file_path, guest1_save, config)
 
             guest2_save = qr_save.parent / f"{sanitized_date}_Guest2Badge.docx"
-            guest2_badges(file_path, guest2_save)
+            guest2_badges(file_path, guest2_save, config)
 
     except Exception:
         logging.exception('Unhandled exception in main')
