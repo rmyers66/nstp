@@ -10,8 +10,10 @@ Double-click **QR Badges.app** to launch.
 2. **Generate & Open**  
    The app creates `yourfile_nametags.docx` alongside your CSV and opens it in Word.
 
-3. **Print**  
+3. **Print**
    Use Avery 5395 label sheets (2 cols × 4 rows per page).
+4. **Optional Config**
+   Provide a JSON or YAML file with `-c myconfig.yml` to override defaults like margins or label sizes.
 
 ## Version
 
