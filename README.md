@@ -34,7 +34,22 @@ Current app version: **1.0.0**
 
 This project is licensed under the [MIT License](LICENSE).
 
+## Converting PNG to Base64
+
+The script `generate_qr_badges_final.py` embeds logo images as Base64 strings.
+Convert your PNG files using the `base64` command (the `--wrap=0` flag keeps the
+output on one line):
+
+```bash
+base64 --wrap=0 GT_full_logo.png > full_logo.b64
+base64 --wrap=0 GT_small_logo.png > small_logo.b64
+```
+
+Copy the contents of these files into the `FULL_LOGO_B64` and `SMALL_LOGO_B64`
+variables near the top of `generate_qr_badges_final.py` to embed your custom
+logos.
+
 ---
 
-*Developed by Your Name*  
+*Developed by Your Name*
 *Contact: you@example.com*
