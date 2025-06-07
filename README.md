@@ -27,6 +27,8 @@ Current app version: **1.0.0**
 - **No dialog?** Make sure you opened the app via its `.app` bundle, not the executable inside.
 - **Permission issues?** Grant **Full Disk Access** to the app in **System Settings → Privacy & Security**.
 - **Gatekeeper block?** Right-click the app, choose **Open**, then confirm.
+- **Exit codes**: When run from the command line, the script returns `1` for
+  failures such as missing dependencies or invalid input.
 
 ## License
 
