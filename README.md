@@ -1,4 +1,4 @@
-# QR Badges App for macOS
+# QR Badges App for macOS and Windows
 
 Double-click **QR Badges.app** to launch.
 
@@ -17,7 +17,7 @@ Double-click **QR Badges.app** to launch.
 
 ## Version
 
-Current app version: **1.0.0**
+Current app version: **3.6.1-postfix**
 
 ## Updating
 
@@ -66,6 +66,20 @@ python3 generate_qr_badges_final.py -i attendees.csv
 ```
 
 The output Word document will be created alongside your input CSV.
+
+## Building Standalone Apps
+
+PyInstaller spec files are provided for macOS (`QR_Badges_mac.spec`) and Windows (`QR_Badges_win.spec`).
+
+```
+# macOS universal build
+pyinstaller QR_Badges_mac.spec
+
+# Windows build
+pyinstaller QR_Badges_win.spec
+```
+
+Each build produces a standalone application bundle. macOS users can create a DMG using `hdiutil` after running the spec.
 
 ---
 
