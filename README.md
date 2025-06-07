@@ -85,6 +85,10 @@ pyinstaller QR_Badges_win.spec
 
 Each build produces a standalone application bundle. macOS users can create a DMG using `hdiutil` after running the spec.
 
+## GitHub Actions Build
+
+A workflow file at `.github/workflows/build.yml` automates these steps. When you push a tag (e.g. `v3.6.1`) or run the workflow manually, GitHub Actions builds the macOS DMG and the Windows ZIP. The resulting artifacts are available for download from the workflow run.
+
 ---
 
 5z4xbu-codex/add-license-file-and-reference-in-readme
