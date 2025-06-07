@@ -10,8 +10,10 @@ Double-click **QR Badges.app** to launch.
 2. **Generate & Open**  
    The app creates `yourfile_nametags.docx` alongside your CSV and opens it in Word.
 
-3. **Print**  
+3. **Print**
    Use Avery 5395 label sheets (2 cols × 4 rows per page).
+4. **Optional Config**
+   Provide a JSON or YAML file with `-c myconfig.yml` to override defaults like margins or label sizes.
 
 ## Version
 
@@ -24,11 +26,48 @@ Current app version: **1.0.0**
 
 ## Troubleshooting
 
-- **No dialog?** Make sure you opened the app via its `.app` bundle, not the executable inside.  
-- **Permission issues?** Grant **Full Disk Access** to the app in **System Settings → Privacy & Security**.  
+- **No dialog?** Make sure you opened the app via its `.app` bundle, not the executable inside.
+- **Permission issues?** Grant **Full Disk Access** to the app in **System Settings → Privacy & Security**.
 - **Gatekeeper block?** Right-click the app, choose **Open**, then confirm.
+- **Exit codes**: When run from the command line, the script returns `1` for
+  failures such as missing dependencies or invalid input.
+
+## License
+
+This project is licensed under the [MIT License](LICENSE).
+
+## Converting PNG to Base64
+
+The script `generate_qr_badges_final.py` embeds logo images as Base64 strings.
+Convert your PNG files using the `base64` command (the `--wrap=0` flag keeps the
+output on one line):
+
+```bash
+base64 --wrap=0 GT_full_logo.png > full_logo.b64
+base64 --wrap=0 GT_small_logo.png > small_logo.b64
+```
+
+Copy the contents of these files into the `FULL_LOGO_B64` and `SMALL_LOGO_B64`
+variables near the top of `generate_qr_badges_final.py` to embed your custom
+logos.
+
+## Running from Source
+
+If you prefer the command-line version, install the Python dependencies and run
+the script directly:
+
+```bash
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+
+# Generate badges from your CSV file
+python3 generate_qr_badges_final.py -i attendees.csv
+```
+
+The output Word document will be created alongside your input CSV.
 
 ---
 
-*Developed by Your Name*  
-*Contact: you@example.com*
+*Developed by R. Clark Myers, M.Ed.*
+*Contact: rmyers66@gatech.edu*
