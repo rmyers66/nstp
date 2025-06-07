@@ -51,6 +51,22 @@ Copy the contents of these files into the `FULL_LOGO_B64` and `SMALL_LOGO_B64`
 variables near the top of `generate_qr_badges_final.py` to embed your custom
 logos.
 
+## Running from Source
+
+If you prefer the command-line version, install the Python dependencies and run
+the script directly:
+
+```bash
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+
+# Generate badges from your CSV file
+python3 generate_qr_badges_final.py -i attendees.csv
+```
+
+The output Word document will be created alongside your input CSV.
+
 ---
 
 *Developed by Your Name*
