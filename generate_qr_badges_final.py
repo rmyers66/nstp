@@ -53,14 +53,14 @@ try:
     from docx.enum.section import WD_ORIENT
 except ImportError:
     print("Error: The 'python-docx' package is required. Install with:\n    pip install python-docx")
-    sys.exit(0)
+    sys.exit(1)
 
 # pandas is required
 try:
     import pandas as pd
 except ImportError:
     print("Error: The 'pandas' package is required. Install with:\n    pip install pandas")
-    sys.exit(0)
+    sys.exit(1)
 
 # Configure logging
 default_format = '[%(asctime)s] [%(levelname)s] %(message)s'
@@ -157,7 +157,7 @@ def open_file(path: Path, background: bool = False) -> None:
 def pick_input_file() -> Path:
     if not _tk_available:
         print('Error: tkinter is not available. Supply -i <input.csv>.')
-        sys.exit(0)
+        sys.exit(1)
     root = Tk()
     root.withdraw()
     path = filedialog.askopenfilename(
@@ -173,7 +173,7 @@ def pick_input_file() -> Path:
 def pick_save_file(default_name: str) -> Path:
     if not _tk_available:
         print('Error: tkinter not available. Supply -o <output.docx>.')
-        sys.exit(0)
+        sys.exit(1)
     root = Tk()
     root.withdraw()
     save = filedialog.asksaveasfilename(
@@ -194,13 +194,13 @@ def load_records(file_path: Path):
             messagebox.showerror('Invalid Input', 'Only CSV is supported.')
         else:
             print('Error: Only CSV input is supported.')
-        sys.exit(0)
+        sys.exit(1)
 
     try:
         df = pd.read_csv(file_path, dtype=str, encoding='utf-8-sig').fillna('')
     except Exception:
         logging.exception('Failed to read CSV.')
-        sys.exit(0)
+        sys.exit(1)
 
     missing = [col for col in REQUIRED_CSV_COLUMNS if col not in df.columns]
     if missing:
@@ -209,7 +209,7 @@ def load_records(file_path: Path):
             messagebox.showerror('Invalid CSV Schema', msg)
         else:
             print(f'Error: {msg}')
-        sys.exit(0)
+        sys.exit(1)
 
     return df.to_dict(orient='records')
 
@@ -1251,7 +1251,7 @@ def main() -> None:
                 pass
         else:
             print('Error:', traceback.format_exc(), file=sys.stderr)
-        sys.exit(0)
+        sys.exit(1)
 
 
 if __name__ == '__main__':
