@@ -24,11 +24,15 @@ Current app version: **1.0.0**
 
 ## Troubleshooting
 
-- **No dialog?** Make sure you opened the app via its `.app` bundle, not the executable inside.  
-- **Permission issues?** Grant **Full Disk Access** to the app in **System Settings → Privacy & Security**.  
+- **No dialog?** Make sure you opened the app via its `.app` bundle, not the executable inside.
+- **Permission issues?** Grant **Full Disk Access** to the app in **System Settings → Privacy & Security**.
 - **Gatekeeper block?** Right-click the app, choose **Open**, then confirm.
+
+## License
+
+This project is licensed under the [MIT License](LICENSE).
 
 ---
 
-*Developed by Your Name*  
-*Contact: you@example.com*
+*Developed by R. Clark Myers, M.Ed.*
+*Contact: rmyers66@gatech.edu*
