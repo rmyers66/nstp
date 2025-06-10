@@ -1,8 +1,6 @@
 name: Build QR Badges
 
-codex/distribute-app-for-windows-and-macos-without-fees
 on:
-main
   push:
     tags:
       - 'v*'
@@ -23,7 +21,6 @@ jobs:
       - name: Build macOS app
         run: python -m PyInstaller QR_Badges_mac.spec
       - name: Create DMG
- codex/distribute-app-for-windows-and-macos-without-fees
         run: |
           rm -f QR_Badges.dmg
           hdiutil create -volname "QR Badges" -srcfolder "dist/QR Badges.app" -ov QR_Badges.dmg
