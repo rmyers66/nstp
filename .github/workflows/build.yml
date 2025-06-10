@@ -1,6 +1,6 @@
 name: Build QR Badges
 
-on:
+'on':
   push:
     tags:
       - 'v*'
