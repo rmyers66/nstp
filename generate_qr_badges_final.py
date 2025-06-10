@@ -2,7 +2,7 @@
 # v3.6.1-postfix — logos embedded as Base64
 
 """
-generate_qr_name_badges.py v3.6.1-postfix
+generate_qr_badges_final.py v3.6.1-postfix
 
 This version embeds the two PNG assets (full GT logo and small GT mark)
 directly into the script (Base64). At runtime, they’re decoded via PIL and displayed.
@@ -1108,4 +1108,4 @@ if __name__ == '__main__':
 # John,Doe,2,M,http://example.com/qr1.png,CS,Atlanta,GA,1,he/him,2025-08-01,Jane,Doe,Friend,Mark,Doe,Colleague
 #
 # Then run:
-#     python3 generate_qr_name_badges.py -i test_dummy.csv
+#     python3 generate_qr_badges_final.py -i test_dummy.csv
