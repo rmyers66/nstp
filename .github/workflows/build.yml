@@ -1,7 +1,7 @@
 name: Build QR Badges
 
 codex/distribute-app-for-windows-and-macos-without-fees
-'on':
+on:
 main
   push:
     tags:
