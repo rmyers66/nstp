@@ -1,8 +1,14 @@
+---
 name: Build QR Badges
 
-on:
- main
-  push:
+"on":
+          hdiutil create \
+            -volname "QR Badges" \
+            -srcfolder "dist/QR Badges.app" \
+            -ov QR_Badges.dmg
+        run: |
+          Compress-Archive -Path dist/QR_Badges `
+            -DestinationPath QR_Badges.zip
     tags:
       - 'v*'
   workflow_dispatch:
