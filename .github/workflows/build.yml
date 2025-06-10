@@ -1,0 +1,50 @@
+name: Build QR Badges
+
+'on':
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+
+jobs:
+  macos:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt pyinstaller
+      - name: Build macOS app
+        run: python -m PyInstaller QR_Badges_mac.spec
+      - name: Create DMG
+        run: |
+          rm -f QR_Badges.dmg
+          hdiutil create -volname "QR Badges" -srcfolder "dist/QR Badges.app" -ov QR_Badges.dmg
+      - uses: actions/upload-artifact@v4
+        with:
+          name: qr-badges-macos
+          path: QR_Badges.dmg
+
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: '3.x'
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt pyinstaller
+      - name: Build Windows exe
+        run: python -m PyInstaller QR_Badges_win.spec
+      - name: Compress build
+        run: Compress-Archive -Path dist/QR_Badges -DestinationPath QR_Badges.zip
+      - uses: actions/upload-artifact@v4
+        with:
+          name: qr-badges-windows
+          path: QR_Badges.zip
