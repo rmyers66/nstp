@@ -1,6 +1,7 @@
 name: Build QR Badges
 
-'on':
+on:
+ main
   push:
     tags:
       - 'v*'
@@ -24,6 +25,8 @@ jobs:
         run: |
           rm -f QR_Badges.dmg
           hdiutil create -volname "QR Badges" -srcfolder "dist/QR Badges.app" -ov QR_Badges.dmg
+codex/distribute-app-for-windows-and-macos-without-fees
+ main
       - uses: actions/upload-artifact@v4
         with:
           name: qr-badges-macos
