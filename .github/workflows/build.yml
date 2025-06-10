@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  macos:
+  build-macos:
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v3
@@ -23,13 +23,13 @@ jobs:
       - name: Create DMG
         run: |
           rm -f QR_Badges.dmg
-          hdiutil create -volname "QR Badges" -srcfolder "dist/QR Badges.app" -ov QR_Badges.dmg
+          hdiutil create -volname "QR Badges" -srcfolder "dist/QR Badges.app" -ov -format UDZO QR_Badges.dmg
       - uses: actions/upload-artifact@v4
         with:
           name: qr-badges-macos
           path: QR_Badges.dmg
 
-  windows:
+  build-windows:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v3
