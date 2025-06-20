@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-# v3.6.1-postfix — logos embedded as Base64
+# v3.6.2 — logos embedded as Base64
 
 """
-generate_qr_badges_final.py v3.6.1-postfix
+generate_qr_badges_final.py v3.6.2
 
 This version embeds the two PNG assets (full GT logo and small GT mark)
 directly into the script (Base64). At runtime, they’re decoded via PIL and displayed.
@@ -604,8 +604,9 @@ def name_badges_fixed(file_path: Path, save_path: Path, cfg: dict = DEFAULT_CONF
 
             group = safe_str(rec.get('Group Number', '')).strip()
             group = f"Group: {group}" if group else ''
+
             pronouns = safe_str(rec.get('Pronouns', '')).strip()
-            gp_text = ' – '.join(filter(None, [group, pronouns]))
+            gp_text = ' – '.join(filter(None, [group_text, pronouns]))
             if gp_text:
                 add_centered_paragraph(gp_text, font_size=11)
 
