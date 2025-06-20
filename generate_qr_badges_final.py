@@ -603,7 +603,8 @@ def name_badges_fixed(file_path: Path, save_path: Path, cfg: dict = DEFAULT_CONF
                 add_centered_paragraph(cs_text, font_size=11)
 
             group = safe_str(rec.get('Group Number', '')).strip()
-            group_text = f"Group: {group}" if group else ''
+            group = f"Group: {group}" if group else ''
+
             pronouns = safe_str(rec.get('Pronouns', '')).strip()
             gp_text = ' – '.join(filter(None, [group_text, pronouns]))
             if gp_text:
