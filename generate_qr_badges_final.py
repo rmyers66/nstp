@@ -606,7 +606,13 @@ def name_badges_fixed(file_path: Path, save_path: Path, cfg: dict = DEFAULT_CONF
             group = f"Group: {group}" if group else ''
 
             pronouns = safe_str(rec.get('Pronouns', '')).strip()
-            gp_text = ' – '.join(filter(None, [group_text, pronouns]))
+            gp_parts = []
+            if group:
+                gp_parts.append(f"Group: {group}")
+            if pronouns:
+                gp_parts.append(pronouns)
+            gp_text = ' – '.join(gp_parts)
+
             if gp_text:
                 add_centered_paragraph(gp_text, font_size=11)
 
