@@ -127,8 +127,8 @@ REQUIRED_CSV_COLUMNS = [
     'group'
 ]
 
-# Accept either "group" or "Group Number" in the input CSV
-GROUP_COLUMN_ALIASES = ['group', 'Group Number']
+# Accept "group", "Group", or "Group Number" in the input CSV
+GROUP_COLUMN_ALIASES = ['group', 'Group', 'Group Number']
 
 
 def _choose_font(root):
@@ -236,7 +236,7 @@ def load_records(file_path: Path):
         logging.exception('Failed to read CSV.')
         sys.exit(1)
 
-    # Check required columns, allowing either 'group' or 'Group Number'
+    # Check required columns, allowing 'group', 'Group', or 'Group Number'
     missing = [col for col in REQUIRED_CSV_COLUMNS if col != 'group' and col not in df.columns]
 
     if not any(alias in df.columns for alias in GROUP_COLUMN_ALIASES):

@@ -5,7 +5,7 @@ Double-click **QR Badges.app** to launch.
 ## Usage
 
 1. **Select your CSV**
-   Must have columns `Preferred,Last,Code,group` (or `Group Number` for the group ID).
+   Must have columns `Preferred,Last,Code,group` (or `Group` or `Group Number` for the group ID).
 
 
 2. **Generate & Open**  
