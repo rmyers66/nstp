@@ -7,6 +7,7 @@ Double-click **QR Badges.app** to launch.
 1. **Select your CSV**
    Must have columns `Preferred,Last,Code,group` (or `Group Number` for the group ID).
 
+
 2. **Generate & Open**  
    The app creates `yourfile_nametags.docx` alongside your CSV and opens it in Word.
 
