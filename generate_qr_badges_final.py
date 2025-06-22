@@ -123,8 +123,12 @@ REQUIRED_CSV_COLUMNS = [
     'Preferred', 'Last',
     'FASET Total Guest Count',
     'Guest 1 Preferred Name', 'Guest 1 Last Name', 'Guest 1 Affiliations',
-    'Guest 2 Preferred Name', 'Guest 2 Last Name', 'Guest 2 Affiliations'
+    'Guest 2 Preferred Name', 'Guest 2 Last Name', 'Guest 2 Affiliations',
+    'group'
 ]
+
+# Accept either "group" or "Group Number" in the input CSV
+GROUP_COLUMN_ALIASES = ['group', 'Group Number']
 
 
 def _choose_font(root):
@@ -232,7 +236,12 @@ def load_records(file_path: Path):
         logging.exception('Failed to read CSV.')
         sys.exit(1)
 
-    missing = [col for col in REQUIRED_CSV_COLUMNS if col not in df.columns]
+    # Check required columns, allowing either 'group' or 'Group Number'
+    missing = [col for col in REQUIRED_CSV_COLUMNS if col != 'group' and col not in df.columns]
+
+    if not any(alias in df.columns for alias in GROUP_COLUMN_ALIASES):
+        missing.append('group')
+
     if missing:
         msg = f"Missing required CSV columns: {', '.join(missing)}"
         if _tk_available:
