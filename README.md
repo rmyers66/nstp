@@ -5,8 +5,8 @@ Double-click **QR Badges.app** to launch.
 ## Usage
 
 1. **Select your CSV**
-   Must have columns `Preferred,Last,Code` (Slate QR URLs).
-   The group column may be titled `group`, `Group`, or `Group Number` (case-insensitive).
+   Must have columns `Preferred,Last,Code,group` (or `Group Number` for the group ID).
+
 
 2. **Generate & Open**  
    The app creates `yourfile_nametags.docx` alongside your CSV and opens it in Word.
