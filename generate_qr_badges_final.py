@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-# v3.6.1-postfix — logos embedded as Base64
+# v3.6.2 — logos embedded as Base64
 
 """
-generate_qr_badges_final.py v3.6.1-postfix
+generate_qr_badges_final.py v3.6.2
 
 This version embeds the two PNG assets (full GT logo and small GT mark)
 directly into the script (Base64). At runtime, they’re decoded via PIL and displayed.
@@ -602,9 +602,14 @@ def name_badges_fixed(file_path: Path, save_path: Path, cfg: dict = DEFAULT_CONF
                 cs_text = f"{home_city}, {home_state}".strip(', ')
                 add_centered_paragraph(cs_text, font_size=11)
 
-            group = safe_str(rec.get('Group Number', '')).strip()
+            group = safe_str(rec.get('group', rec.get('Group Number', ''))).strip()
             pronouns = safe_str(rec.get('Pronouns', '')).strip()
-            gp_text = ' – '.join(filter(None, [group, pronouns]))
+            gp_parts = []
+            if group:
+                gp_parts.append(f"Group: {group}")
+            if pronouns:
+                gp_parts.append(f"Pronouns: {pronouns}")
+            gp_text = ' '.join(gp_parts)
             if gp_text:
                 add_centered_paragraph(gp_text, font_size=11)
 
@@ -1104,7 +1109,7 @@ if __name__ == '__main__':
 # Simple Test Case (bottom of script)
 # ----------------------------
 # To test, create a dummy CSV named 'test_dummy.csv' containing:
-# Preferred,Last,FASET Total Guest Count,FASET Shirt Size,Code,Major,Home City,Home State/Region,Group Number,Pronouns,FASET Session Date,Guest 1 Preferred Name,Guest 1 Last Name,Guest 1 Affiliations,Guest 2 Preferred Name,Guest 2 Last Name,Guest 2 Affiliations
+# Preferred,Last,FASET Total Guest Count,FASET Shirt Size,Code,Major,Home City,Home State/Region,group,Pronouns,FASET Session Date,Guest 1 Preferred Name,Guest 1 Last Name,Guest 1 Affiliations,Guest 2 Preferred Name,Guest 2 Last Name,Guest 2 Affiliations
 # John,Doe,2,M,http://example.com/qr1.png,CS,Atlanta,GA,1,he/him,2025-08-01,Jane,Doe,Friend,Mark,Doe,Colleague
 #
 # Then run:
