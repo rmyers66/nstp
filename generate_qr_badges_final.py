@@ -254,6 +254,16 @@ def safe_int(val_str):
         return 0
 
 
+def get_column_any(record: dict, *names: str):
+    """Return the value for the first matching column name (case-insensitive)."""
+    lower_map = {k.lower(): v for k, v in record.items()}
+    for name in names:
+        val = lower_map.get(name.lower())
+        if val is not None:
+            return val
+    return ""
+
+
 def download_qr_image(url: str, idx: int, timeout: int = 15):
     try:
         import requests
@@ -602,7 +612,9 @@ def name_badges_fixed(file_path: Path, save_path: Path, cfg: dict = DEFAULT_CONF
                 cs_text = f"{home_city}, {home_state}".strip(', ')
                 add_centered_paragraph(cs_text, font_size=11)
 
-            group = safe_str(rec.get('group', rec.get('Group Number', ''))).strip()
+            group = safe_str(
+                get_column_any(rec, 'group', 'Group', 'Group Number')
+            ).strip()
 
             pronouns = safe_str(rec.get('Pronouns', '')).strip()
             gp_parts = []
@@ -1112,7 +1124,8 @@ if __name__ == '__main__':
 # Simple Test Case (bottom of script)
 # ----------------------------
 # To test, create a dummy CSV named 'test_dummy.csv' containing:
-# Preferred,Last,FASET Total Guest Count,FASET Shirt Size,Code,Major,Home City,Home State/Region,group,Pronouns,FASET Session Date,Guest 1 Preferred Name,Guest 1 Last Name,Guest 1 Affiliations,Guest 2 Preferred Name,Guest 2 Last Name,Guest 2 Affiliations
+# Preferred,Last,FASET Total Guest Count,FASET Shirt Size,Code,Major,Home City,Home State/Region,Group Number,Pronouns,FASET Session Date,Guest 1 Preferred Name,Guest 1 Last Name,Guest 1 Affiliations,Guest 2 Preferred Name,Guest 2 Last Name,Guest 2 Affiliations
+# (The "Group Number" column can also be titled "group" or "Group")
 # John,Doe,2,M,http://example.com/qr1.png,CS,Atlanta,GA,1,he/him,2025-08-01,Jane,Doe,Friend,Mark,Doe,Colleague
 #
 # Then run:
