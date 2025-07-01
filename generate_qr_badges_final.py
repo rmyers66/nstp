@@ -778,7 +778,6 @@ def name_badges_with_qr_back(file_path: Path, save_path: Path, args, cfg: dict =
                 if session_date:
                     add_centered(session_date, font_size=11)
 
-
             # QR code page (reverse order left/right)
             table = doc.add_table(rows=rows, cols=cols)
             table.autofit = False
@@ -840,6 +839,10 @@ def name_badges_with_qr_back(file_path: Path, save_path: Path, args, cfg: dict =
             # the available space. Adding explicit page breaks here inserted
             # blank sheets after the QR code pages, so we rely on the
             # automatic behavior instead.
+
+            if chunk_start + per_page < total:
+                doc.add_page_break()
+
 
         tp = doc.add_paragraph()
         tp.paragraph_format.space_before = Pt(0)
