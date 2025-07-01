@@ -778,7 +778,6 @@ def name_badges_with_qr_back(file_path: Path, save_path: Path, args, cfg: dict =
                 if session_date:
                     add_centered(session_date, font_size=11)
 
-
             # QR code page (reverse order left/right)
             table = doc.add_table(rows=rows, cols=cols)
             table.autofit = False
