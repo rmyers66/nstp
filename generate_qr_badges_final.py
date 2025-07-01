@@ -835,8 +835,14 @@ def name_badges_with_qr_back(file_path: Path, save_path: Path, args, cfg: dict =
                         err = cell.add_paragraph('QR download error')
                         err.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
 
+            # Word will automatically start a new page once the table fills
+            # the available space. Adding explicit page breaks here inserted
+            # blank sheets after the QR code pages, so we rely on the
+            # automatic behavior instead.
+
             if chunk_start + per_page < total:
                 doc.add_page_break()
+
 
         tp = doc.add_paragraph()
         tp.paragraph_format.space_before = Pt(0)
