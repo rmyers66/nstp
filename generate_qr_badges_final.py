@@ -880,10 +880,10 @@ def guest1_badges(file_path: Path, save_path: Path, cfg: dict = DEFAULT_CONFIG) 
         if safe_int(safe_str(r.get('FASET Total Guest Count', '0'))) >= 1
     ]
 
-    # Sort by student Preferred+Last (same as student badge order)
+    # Sort alphabetically by the guest's name rather than the student's
     filtered.sort(key=lambda r: (
-        safe_str(r.get('Last', '')).lower(),
-        safe_str(r.get('Preferred', '')).lower()
+        safe_str(r.get('Guest 1 Last Name', '')).lower(),
+        safe_str(r.get('Guest 1 Preferred Name', '')).lower()
     ))
 
     total = len(filtered)
@@ -1019,10 +1019,10 @@ def guest2_badges(file_path: Path, save_path: Path, cfg: dict = DEFAULT_CONFIG) 
         if safe_int(safe_str(r.get('FASET Total Guest Count', '0'))) >= 2
     ]
 
-    # Sort by student Preferred+Last (same as student badge order)
+    # Sort alphabetically by the guest's name rather than the student's
     filtered.sort(key=lambda r: (
-        safe_str(r.get('Last', '')).lower(),
-        safe_str(r.get('Preferred', '')).lower()
+        safe_str(r.get('Guest 2 Last Name', '')).lower(),
+        safe_str(r.get('Guest 2 Preferred Name', '')).lower()
     ))
 
     total = len(filtered)
