@@ -109,11 +109,11 @@ FALLBACK_FONTS = ['Helvetica', 'Arial']
 
 DEFAULT_CONFIG = {
     'margins': {'top': 0.5, 'bottom': 0.5, 'left': 0.25, 'right': 0.25},
-    'per_page_qr': 8,
+    'per_page_qr': 6,
     'columns_qr': 2,
     'qr_size_in': 1.5,
     'font_size_pt': 12,
-    'label_dims_in_qr': {'width': 3.5, 'height': 2.5},
+    'label_dims_in_qr': {'width': 4.0, 'height': 3.0},
     'per_page_name': 6,
     'columns_name': 2,
     'label_dims_in_name': {'width': 4.0, 'height': 3.0}
@@ -493,13 +493,6 @@ def generate_labels(file_path: Path, save_path: Path, args, cfg: dict) -> None:
                     err = cell.add_paragraph('QR download error')
                     err.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
 
-        tp = doc.add_paragraph()
-        tp.paragraph_format.space_before = Pt(0)
-        tp.paragraph_format.space_after = Pt(0)
-        rt = tp.add_run(f"Total Count: {total}")
-        rt.bold = True
-        tp.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
-
         doc.save(save_path)
 
         for tmp in temp_files:
@@ -650,6 +643,212 @@ def name_badges_fixed(file_path: Path, save_path: Path, cfg: dict = DEFAULT_CONF
     outdir = save_path.parent
     pdf_path = convert_to_pdf(save_path, outdir)
     open_file(save_path, background=True)
+    if pdf_path:
+        open_file(pdf_path, background=False)
+    else:
+        if _tk_available:
+            messagebox.showerror('PDF Export Failed', 'Could not convert to PDF.')
+        else:
+            print('Warning: PDF conversion failed. DOCX saved at:', save_path)
+
+
+def name_badges_with_qr_back(file_path: Path, save_path: Path, args, cfg: dict = DEFAULT_CONFIG) -> None:
+    """Generate student name badges with QR codes on the back."""
+    records = load_records(file_path)
+
+    def safe_str(val):
+        return str(val) if val is not None else ''
+
+    records.sort(key=lambda r: (
+        safe_str(r.get('Last', '')).lower(),
+        safe_str(r.get('Preferred', '')).lower()
+    ))
+
+    total = len(records)
+    start_time = time.time()
+
+    doc = Document()
+    sec = doc.sections[0]
+    sec.page_height = Inches(11)
+    sec.page_width = Inches(8.5)
+    sec.top_margin = Inches(1.0)
+    sec.bottom_margin = Inches(1.0)
+    sec.left_margin = Inches(0.25)
+    sec.right_margin = Inches(0.25)
+
+    per_page = cfg['per_page_name']
+    cols = cfg['columns_name']
+    rows = per_page // cols
+
+    temp_files = []
+
+    prog, bar, percent_label, info_label = create_progress_window(
+        "GT Student Badges w/QR Generator", total)
+
+    try:
+        for chunk_start in range(0, total, per_page):
+            chunk = records[chunk_start:chunk_start + per_page]
+
+            # Student name badge page
+            table = doc.add_table(rows=rows, cols=cols)
+            table.autofit = False
+            for cell in table.columns[0].cells:
+                cell.width = Inches(cfg['label_dims_in_name']['width'])
+            for cell in table.columns[1].cells:
+                cell.width = Inches(cfg['label_dims_in_name']['width'])
+            for row in table.rows:
+                row.height = Inches(cfg['label_dims_in_name']['height'])
+                row.height_rule = WD_ROW_HEIGHT_RULE.EXACTLY
+
+            for i, rec in enumerate(chunk):
+                idx = chunk_start + i + 1
+                if _tk_available and prog:
+                    elapsed = time.time() - start_time
+                    avg_per = elapsed / idx
+                    remaining = total - idx
+                    eta_seconds = int(avg_per * remaining)
+                    eta_str = (
+                        time.strftime('%M:%S', time.gmtime(eta_seconds))
+                        if eta_seconds < 3600
+                        else time.strftime('%H:%M:%S', time.gmtime(eta_seconds))
+                    )
+
+                    bar['value'] = idx
+                    pct = int((idx / total) * 100)
+                    percent_label.config(text=f"{pct}%")
+                    info_label.config(text=f"{idx} of {total} | ETA: {eta_str}")
+                    prog.update()
+
+                r, c = divmod(i, cols)
+                cell = table.rows[r].cells[c]
+
+                cell.add_paragraph()
+                cell.add_paragraph()
+                cell.add_paragraph()
+
+                def add_centered(text, font_size, bold=False):
+                    p = cell.add_paragraph()
+                    p.paragraph_format.space_before = Pt(0)
+                    p.paragraph_format.space_after = Pt(0)
+                    run = p.add_run(text)
+                    run.bold = bold
+                    run.font.size = Pt(font_size)
+                    p.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
+
+                name_text = (
+                    f"{safe_str(rec.get('Preferred', '')).strip()} "
+                    f"{safe_str(rec.get('Last', '')).strip()}"
+                )
+                if name_text.strip():
+                    add_centered(name_text, font_size=15, bold=True)
+
+                major = safe_str(rec.get('Major', '')).strip()
+                if major:
+                    add_centered(major, font_size=11)
+
+                home_city = safe_str(rec.get('Home City', '')).strip()
+                home_state = safe_str(rec.get('Home State/Region', '')).strip()
+                if home_city or home_state:
+                    cs_text = f"{home_city}, {home_state}".strip(', ')
+                    add_centered(cs_text, font_size=11)
+
+                group = safe_str(
+                    get_column_any(rec, 'group', 'Group', 'Group Number')
+                ).strip()
+
+                pronouns = safe_str(rec.get('Pronouns', '')).strip()
+                gp_parts = []
+                if group:
+                    gp_parts.append(f"Group: {group}")
+                if pronouns:
+                    gp_parts.append(f"Pronouns: {pronouns}")
+                gp_text = ' '.join(gp_parts)
+
+                if gp_text:
+                    add_centered(gp_text, font_size=11)
+
+                session_date = safe_str(rec.get('FASET Session Date', '')).strip()
+                if session_date:
+                    add_centered(session_date, font_size=11)
+
+
+            # QR code page (reverse order left/right)
+            table = doc.add_table(rows=rows, cols=cols)
+            table.autofit = False
+            for cell in table.columns[0].cells:
+                cell.width = Inches(cfg['label_dims_in_name']['width'])
+            for cell in table.columns[1].cells:
+                cell.width = Inches(cfg['label_dims_in_name']['width'])
+            for row in table.rows:
+                row.height = Inches(cfg['label_dims_in_name']['height'])
+                row.height_rule = WD_ROW_HEIGHT_RULE.EXACTLY
+
+            for i, rec in enumerate(chunk):
+                r, c = divmod(i, cols)
+                c = cols - 1 - c
+                cell = table.rows[r].cells[c]
+
+                count_val = safe_str(rec.get('FASET Total Count', '')).strip()
+                count_display = count_val if count_val else '1'
+
+                p = cell.add_paragraph()
+                p.paragraph_format.space_before = Pt(0)
+                p.paragraph_format.space_after = Pt(0)
+                name_text = (
+                    f"{safe_str(rec.get('Preferred', '')).strip()} "
+                    f"{safe_str(rec.get('Last', '')).strip()} - {count_display}"
+                ).strip()
+                run = p.add_run(name_text)
+                run.bold = True
+                run.font.size = Pt(cfg['font_size_pt'])
+                p.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
+
+                shirt = safe_str(rec.get('FASET Shirt Size', '')).strip()
+                if shirt:
+                    ps = cell.add_paragraph()
+                    ps.paragraph_format.space_before = Pt(0)
+                    ps.paragraph_format.space_after = Pt(0)
+                    rs = ps.add_run(f"Shirt Size: {shirt}")
+                    rs.font.size = Pt(cfg['font_size_pt'])
+                    ps.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
+
+                qr_url = safe_str(rec.get('Code', '')).strip()
+                if qr_url:
+                    img_path = download_qr_image(qr_url, chunk_start + i + 1)
+                    if img_path:
+                        temp_files.append(img_path)
+                        ip = cell.add_paragraph()
+                        ip.paragraph_format.space_before = Pt(0)
+                        ip.paragraph_format.space_after = Pt(0)
+                        ip.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
+                        ip.add_run().add_picture(
+                            str(img_path),
+                            width=Inches(cfg['qr_size_in'])
+                        )
+                    else:
+                        err = cell.add_paragraph('QR download error')
+                        err.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
+
+            # Word will automatically start a new page once the table fills
+            # the available space. Adding explicit page breaks here inserted
+            # blank sheets after the QR code pages, so we rely on the
+            # automatic behavior instead.
+
+        doc.save(save_path)
+
+        for tmp in temp_files:
+            try:
+                tmp.unlink()
+            except Exception:
+                logging.warning(f"Could not delete temp file {tmp}")
+
+    finally:
+        if prog:
+            prog.destroy()
+
+    outdir = save_path.parent
+    pdf_path = convert_to_pdf(save_path, outdir)
+    open_file(save_path, background=False)
     if pdf_path:
         open_file(pdf_path, background=False)
     else:
@@ -1025,6 +1224,15 @@ def main() -> None:
             )
             btn_student.pack(fill='x', padx=60, pady=12)
 
+            btn_student_qr = TtkButton(
+                root,
+                text='Student Badges with QR Backs',
+                command=lambda: select_and_close('studentqr'),
+                style='Flat.TButton',
+                padding=(20, 12)
+            )
+            btn_student_qr.pack(fill='x', padx=60, pady=12)
+
             btn_guest1 = TtkButton(
                 root,
                 text='Guest 1 Name Badges Only',
@@ -1090,6 +1298,11 @@ def main() -> None:
             save_path = Path(args.output) if args.output else pick_save_file(default_name)
             name_badges_fixed(file_path, save_path, config)
 
+        elif template == 'studentqr':
+            default_name = f"{sanitized_date}_StudentBadges_with_QR.docx"
+            save_path = Path(args.output) if args.output else pick_save_file(default_name)
+            name_badges_with_qr_back(file_path, save_path, args, config)
+
         elif template == 'guest1':
             default_name = f"{sanitized_date}_Guest1Badge.docx"
             save_path = Path(args.output) if args.output else pick_save_file(default_name)
@@ -1101,17 +1314,14 @@ def main() -> None:
             guest2_badges(file_path, save_path, config)
 
         else:  # 'all'
-            qr_name = f"{sanitized_date}_QRBadges.docx"
-            qr_save = pick_save_file(qr_name)
-            generate_labels(file_path, qr_save, args, config)
+            combo_name = f"{sanitized_date}_StudentBadges_with_QR.docx"
+            combo_save = pick_save_file(combo_name)
+            name_badges_with_qr_back(file_path, combo_save, args, config)
 
-            student_save = qr_save.parent / f"{sanitized_date}_StudentNameBadges.docx"
-            name_badges_fixed(file_path, student_save, config)
-
-            guest1_save = qr_save.parent / f"{sanitized_date}_Guest1Badge.docx"
+            guest1_save = combo_save.parent / f"{sanitized_date}_Guest1Badge.docx"
             guest1_badges(file_path, guest1_save, config)
 
-            guest2_save = qr_save.parent / f"{sanitized_date}_Guest2Badge.docx"
+            guest2_save = combo_save.parent / f"{sanitized_date}_Guest2Badge.docx"
             guest2_badges(file_path, guest2_save, config)
 
     except Exception:
