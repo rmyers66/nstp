@@ -1136,6 +1136,146 @@ def guest2_badges(file_path: Path, save_path: Path, cfg: dict = DEFAULT_CONFIG) 
             print('Warning: PDF conversion failed. DOCX saved at:', save_path)
 
 
+def guest_badges(file_path: Path, save_path: Path, cfg: dict = DEFAULT_CONFIG) -> None:
+    """Generate name badges for all guests sorted alphabetically."""
+    records = load_records(file_path)
+
+    def safe_str(val):
+        return str(val) if val is not None else ''
+
+    entries = []
+    for r in records:
+        total_guests = safe_int(safe_str(r.get('FASET Total Guest Count', '0')))
+        if total_guests >= 1:
+            entries.append({
+                'pref': safe_str(r.get('Guest 1 Preferred Name', '')).strip(),
+                'last': safe_str(r.get('Guest 1 Last Name', '')).strip(),
+                'aff': safe_str(r.get('Guest 1 Affiliations', '')).strip(),
+                'host_pref': safe_str(r.get('Preferred', '')).strip(),
+                'host_last': safe_str(r.get('Last', '')).strip(),
+                'city': safe_str(r.get('Home City', '')).strip(),
+                'state': safe_str(r.get('Home State/Region', '')).strip(),
+                'date': safe_str(r.get('FASET Session Date', '')).strip(),
+            })
+        if total_guests >= 2:
+            entries.append({
+                'pref': safe_str(r.get('Guest 2 Preferred Name', '')).strip(),
+                'last': safe_str(r.get('Guest 2 Last Name', '')).strip(),
+                'aff': safe_str(r.get('Guest 2 Affiliations', '')).strip(),
+                'host_pref': safe_str(r.get('Preferred', '')).strip(),
+                'host_last': safe_str(r.get('Last', '')).strip(),
+                'city': safe_str(r.get('Home City', '')).strip(),
+                'state': safe_str(r.get('Home State/Region', '')).strip(),
+                'date': safe_str(r.get('FASET Session Date', '')).strip(),
+            })
+
+    entries = [e for e in entries if e['pref'] or e['last']]
+    entries.sort(key=lambda e: (e['last'].lower(), e['pref'].lower()))
+
+    total = len(entries)
+    if total == 0:
+        return
+
+    start_time = time.time()
+    doc = Document()
+    sec = doc.sections[0]
+    sec.page_height = Inches(11)
+    sec.page_width = Inches(8.5)
+    sec.top_margin = Inches(1.0)
+    sec.bottom_margin = Inches(1.0)
+    sec.left_margin = Inches(0.25)
+    sec.right_margin = Inches(0.25)
+
+    per_page = cfg['per_page_name']
+    cols = cfg['columns_name']
+
+    prog, bar, percent_label, info_label = create_progress_window(
+        "GT Guest Name Badges Generator", total
+    )
+
+    try:
+        for idx, entry in enumerate(entries, start=1):
+            if _tk_available and prog:
+                elapsed = time.time() - start_time
+                avg_per = elapsed / idx
+                remaining = total - idx
+                eta_seconds = int(avg_per * remaining)
+                eta_str = (
+                    time.strftime('%M:%S', time.gmtime(eta_seconds))
+                    if eta_seconds < 3600
+                    else time.strftime('%H:%M:%S', time.gmtime(eta_seconds))
+                )
+
+                bar['value'] = idx
+                pct = int((idx / total) * 100)
+                percent_label.config(text=f"{pct}%")
+                info_label.config(text=f"{idx} of {total} | ETA: {eta_str}")
+                prog.update()
+
+            if (idx - 1) % per_page == 0:
+                rows = per_page // cols
+                table = doc.add_table(rows=rows, cols=cols)
+                table.autofit = False
+                for cell in table.columns[0].cells:
+                    cell.width = Inches(cfg['label_dims_in_name']['width'])
+                for cell in table.columns[1].cells:
+                    cell.width = Inches(cfg['label_dims_in_name']['width'])
+                for row in table.rows:
+                    row.height = Inches(cfg['label_dims_in_name']['height'])
+                    row.height_rule = WD_ROW_HEIGHT_RULE.EXACTLY
+
+            r, c = divmod((idx - 1) % per_page, cols)
+            cell = table.rows[r].cells[c]
+
+            cell.add_paragraph()
+            cell.add_paragraph()
+            cell.add_paragraph()
+
+            def add_centered_paragraph(text, font_size, bold=False):
+                p = cell.add_paragraph()
+                p.paragraph_format.space_before = Pt(0)
+                p.paragraph_format.space_after = Pt(0)
+                run = p.add_run(text)
+                run.bold = bold
+                run.font.size = Pt(font_size)
+                p.alignment = WD_PARAGRAPH_ALIGNMENT.CENTER
+
+            guest_name = f"{entry['pref']} {entry['last']}".strip()
+            if guest_name:
+                add_centered_paragraph(guest_name, font_size=15, bold=True)
+
+            if entry['host_pref'] or entry['host_last']:
+                add_centered_paragraph(
+                    f"Guest of: {entry['host_pref']} {entry['host_last']}",
+                    font_size=11,
+                )
+
+            if entry['aff']:
+                add_centered_paragraph(entry['aff'], font_size=11)
+
+            if entry['city'] or entry['state']:
+                cs_text = f"{entry['city']}, {entry['state']}".strip(', ')
+                add_centered_paragraph(cs_text, font_size=11)
+
+            if entry['date']:
+                add_centered_paragraph(entry['date'], font_size=11)
+
+        doc.save(save_path)
+    finally:
+        if prog:
+            prog.destroy()
+
+    outdir = save_path.parent
+    pdf_path = convert_to_pdf(save_path, outdir)
+    open_file(save_path, background=True)
+    if pdf_path:
+        open_file(pdf_path, background=False)
+    else:
+        if _tk_available:
+            messagebox.showerror('PDF Export Failed', 'Could not convert to PDF.')
+        else:
+            print('Warning: PDF conversion failed. DOCX saved at:', save_path)
+
 # ----------------------------
 # Main
 # ----------------------------
@@ -1251,6 +1391,15 @@ def main() -> None:
             )
             btn_guest2.pack(fill='x', padx=60, pady=12)
 
+            btn_guests = TtkButton(
+                root,
+                text='All Guest Name Badges',
+                command=lambda: select_and_close('guests'),
+                style='Flat.TButton',
+                padding=(20, 12)
+            )
+            btn_guests.pack(fill='x', padx=60, pady=12)
+
             btn_all = TtkButton(
                 root,
                 text='Print All Badges',
@@ -1312,6 +1461,11 @@ def main() -> None:
             default_name = f"{sanitized_date}_Guest2Badge.docx"
             save_path = Path(args.output) if args.output else pick_save_file(default_name)
             guest2_badges(file_path, save_path, config)
+
+        elif template == 'guests':
+            default_name = f"{sanitized_date}_GuestBadges.docx"
+            save_path = Path(args.output) if args.output else pick_save_file(default_name)
+            guest_badges(file_path, save_path, config)
 
         else:  # 'all'
             combo_name = f"{sanitized_date}_StudentBadges_with_QR.docx"
