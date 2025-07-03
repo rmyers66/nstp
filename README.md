@@ -13,6 +13,7 @@ Double-click **QR Badges.app** to launch.
 
 3. **Print**
    Use Avery 5392 label sheets (2 cols × 3 rows per page). QR codes are printed on the back of the matching name badges.
+   A new **All Guest Name Badges** option prints Guest 1 and Guest 2 badges together sorted alphabetically.
 4. **Optional Config**
    Provide a JSON or YAML file with `-c myconfig.yml` to override defaults like margins or label sizes.
 
