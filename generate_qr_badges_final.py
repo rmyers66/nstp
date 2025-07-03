@@ -1400,14 +1400,14 @@ def main() -> None:
             )
             btn_guests.pack(fill='x', padx=60, pady=12)
 
-            btn_all = TtkButton(
+            btn_studentqr_guests = TtkButton(
                 root,
-                text='Print All Badges',
-                command=lambda: select_and_close('all'),
+                text='Student QR + All Guests',
+                command=lambda: select_and_close('studentqr_guests'),
                 style='Flat.TButton',
                 padding=(20, 12)
             )
-            btn_all.pack(fill='x', padx=60, pady=(12, 60))
+            btn_studentqr_guests.pack(fill='x', padx=60, pady=(12, 60))
 
             # Center window on screen and enlarge
             root.update_idletasks()
@@ -1466,6 +1466,14 @@ def main() -> None:
             default_name = f"{sanitized_date}_GuestBadges.docx"
             save_path = Path(args.output) if args.output else pick_save_file(default_name)
             guest_badges(file_path, save_path, config)
+
+        elif template == 'studentqr_guests':
+            combo_name = f"{sanitized_date}_StudentBadges_with_QR.docx"
+            combo_save = pick_save_file(combo_name)
+            name_badges_with_qr_back(file_path, combo_save, args, config)
+
+            guests_save = combo_save.parent / f"{sanitized_date}_GuestBadges.docx"
+            guest_badges(file_path, guests_save, config)
 
         else:  # 'all'
             combo_name = f"{sanitized_date}_StudentBadges_with_QR.docx"
