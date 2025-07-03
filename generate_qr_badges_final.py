@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
-# v3.6.2 — logos embedded as Base64
+# v3.7.0 — logos embedded as Base64
 
 """
-generate_qr_badges_final.py v3.6.2
+generate_qr_badges_final.py v3.7.0
 
 This version embeds the two PNG assets (full GT logo and small GT mark)
 directly into the script (Base64). At runtime, they’re decoded via PIL and displayed.

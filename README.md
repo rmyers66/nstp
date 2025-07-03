@@ -19,7 +19,7 @@ Double-click **QR Badges.app** to launch.
 
 ## Version
 
-Current app version: **3.6.2**
+Current app version: **3.7.0**
 
 ## Updating
 
@@ -89,15 +89,10 @@ Each build produces a standalone application bundle. macOS users can create a DM
 
 ## GitHub Actions Build
 
-A workflow file at `.github/workflows/build.yml` automates these steps. When you push a tag (e.g. `v3.6.2`) or run the workflow manually, GitHub Actions builds the macOS DMG and the Windows ZIP. The resulting artifacts are available for download from the workflow run.
-codex/distribute-app-for-windows-and-macos-without-fees
-
+A workflow file at `.github/workflows/build.yml` automates these steps. When you push a tag (e.g. `v3.7.0`) or run the workflow manually, GitHub Actions builds the macOS DMG and the Windows ZIP. The resulting artifacts are available for download from the workflow run.
 
 ---
- main
 
-
----
 *Developed by R. Clark Myers, M.Ed.*
 *Contact: rmyers66@gatech.edu*
 

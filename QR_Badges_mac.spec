@@ -50,7 +50,7 @@ app = BUNDLE(
     icon='AppIcon.icns',
     bundle_identifier='com.example.qrbadges',
     info_plist={
-        'CFBundleShortVersionString': '3.6.2',
-        'CFBundleVersion': '3.6.2',
+        'CFBundleShortVersionString': '3.7.0',
+        'CFBundleVersion': '3.7.0',
     }
 )
